@@ -14,15 +14,18 @@ services:
     networks:
       custom:
         ipv4_address: 172.22.0.2
-    image: sequenceiq/kerberos
+    image: kerberosperljava:latest
     hostname: kdc.kerberos.com
+    extra_hosts:
+      - "hadoop.docker.com:172.22.0.3"
     environment:
       REALM: EXAMPLE.COM
       DOMAIN_REALM: kdc.kerberos.com
     volumes:
       - "./config_files/krb5.conf:/etc/krb5.conf"
       - "/dev/urandom:/dev/random"
-      - "/etc/localtime:/etc/localtime:ro"
+      - "/tmp/shared:/shared"
+      #- "/etc/localtime:/etc/localtime:ro"
 
   hadoop-secure:
     networks:
@@ -36,10 +39,23 @@ services:
     tty: true
     extra_hosts:
       - "kdc.kerberos.com kdc:172.22.0.2"
+    ports:
+      - "8888:8888"
+      - "8020:8020"
+      - "8030:8030"
+      - "8031:8031"
+      - "8032:8032"
+      - "8033:8033"
+      - "8040:8040"
+      - "8042:8042"
+      - "8088:8088"
+      - "10020:10020"
+      - "19888:19888"
     environment:
       KRB_REALM: EXAMPLE.COM
       DOMAIN_REALM: kdc.kerberos.com
       FQDN: hadoop.docker.com
     volumes:
       - "./config_files/krb5.conf:/etc/krb5.conf"
-      - "/etc/localtime:/etc/localtime:ro"
+      - "/tmp/shared:/shared"
+      #- "/etc/localtime:/etc/localtime:ro"
